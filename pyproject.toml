@@ -1,0 +1,18 @@
+[project]
+name = "bl-source-plus"
+version = "0.1.0"
+description = "A modern Blender add-on for Valve Source Engine assets, based on Blender Source Tools."
+readme = "README.md"
+authors = [
+    { name = "graphicguy2025", email = "graphicguy2025@163.com" }
+]
+requires-python = ">=3.12"
+dependencies = []
+
+[tool.uv]
+package = false
+
+[dependency-groups]
+dev = [
+    "fake-bpy-module-4-5>=20260730",
+]
