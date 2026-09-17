@@ -25,6 +25,7 @@ from .update import SmdToolsUpdate # comment this line if you make third-party c
 from .flex import *
 
 vca_icon = 'EDITMODE_HLT'
+CATEGORY = "Source Plus"
 
 class SMD_MT_ExportChoice(bpy.types.Menu):
 	bl_label = get_id("exportmenu_title")
@@ -62,9 +63,9 @@ class SMD_MT_ExportChoice(bpy.types.Menu):
 
 class SMD_PT_Scene(bpy.types.Panel):
 	bl_label = get_id("exportpanel_title")
-	bl_space_type = "PROPERTIES"
-	bl_region_type = "WINDOW"
-	bl_context = "scene"
+	bl_space_type = "VIEW_3D"
+	bl_region_type = "UI"
+	bl_category = CATEGORY
 	bl_options = {'DEFAULT_CLOSED'}
 
 	def draw(self, context):
@@ -336,9 +337,9 @@ for map_name in vertex_maps:
 
 class SMD_PT_Object_Config(bpy.types.Panel):
 	bl_label = get_id('exportables_title')
-	bl_space_type = "PROPERTIES"
-	bl_region_type = "WINDOW"
-	bl_context = "scene"
+	bl_space_type = "VIEW_3D"
+	bl_region_type = "UI"
+	bl_category = CATEGORY
 	bl_options = {'DEFAULT_CLOSED'}
 	
 	def draw(self,context):
@@ -358,9 +359,9 @@ class SMD_PT_Object_Config(bpy.types.Panel):
 			l.column().prop(item.vs,"subdir",icon='FILE_FOLDER')
 
 class ExportableConfigurationPanel(bpy.types.Panel):
-	bl_space_type = "PROPERTIES"
-	bl_region_type = "WINDOW"
-	bl_context = "scene"
+	bl_space_type = "VIEW_3D"
+	bl_region_type = "UI"
+	bl_category = CATEGORY
 	bl_parent_id = "SMD_PT_Object_Config"
 	bl_options = {'DEFAULT_CLOSED'}
 	vs_icon = ""
@@ -592,9 +593,9 @@ class SMD_PT_Curves(ExportableConfigurationPanel):
 
 class SMD_PT_Scene_QC_Complie(bpy.types.Panel):
 	bl_label = get_id("qc_title")
-	bl_space_type = "PROPERTIES"
-	bl_region_type = "WINDOW"
-	bl_context = "scene"
+	bl_space_type = "VIEW_3D"
+	bl_region_type = "UI"
+	bl_category = CATEGORY
 	bl_options = {'DEFAULT_CLOSED'}
 
 	searchPath = None
