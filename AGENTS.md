@@ -3,7 +3,7 @@ A Blender add-on for importing and exporting Valve Source Engine assets (SMD, DM
 
 ## Tech Stack
 - Language: Python 3.12 (`.python-version`, `pyproject.toml`)
-- Runtime / Framework: Blender 4.1+ add-on (`bpy`, `bmesh`, `mathutils`)
+- Runtime / Framework: Blender add-on (`bpy`, `bmesh`, `mathutils`); primary target is **4.5 LTS** (the dev/dependency baseline), 4.1+ should work in theory but is not guaranteed
 - Key Dependencies: none at runtime; dev-only `fake-bpy-module-4-5` for `bpy` type stubs
 - Package Manager: `uv` (non-package project; dev env + dependency management only)
 
@@ -49,11 +49,11 @@ uv run python <script>
 There is no test, lint, typecheck, or format command configured in this repo. Do not assume one exists. `uv build` is intentionally unavailable (no build backend).
 
 ### Workflows
+- Use the standalone `blender-cli` program for add-on functional testing. See [blender-functional-testing.md](.agents/workflows/blender-functional-testing.md) for the project workflow.
 - **Building the add-on**: run `scripts/build_addon.py`. It reads the version from `[project].version` in `pyproject.toml` (via `tomllib`) for the zip filename, stages the source excluding `__pycache__`/compiled files, and writes a zip whose single top-level folder is `bl_source_plus/` (required by Blender's install-from-zip).
 - **Installing**: in Blender 4.1+, *Edit > Preferences > Add-ons > Install...* and pick the zip from `dist/`.
 
 ## Notes
-- The add-on cannot be exercised from the CLI; functional verification requires loading it in Blender 4.1+ (its `__init__.py` supports `register()` under `__main__`).
 - The add-on package was renamed from the vendored `io_scene_valvesource/` to `src/bl_source_plus/`. All imports are relative, so only the install module id changed; the underlying Blender Source Tools logic is untouched for now.
 - `update.py` still self-updates from the original Blender Source Tools server and extracts into the package's parent directory; it is effectively non-functional for this project until repointed.
 - `README.md` is empty and there is no `CONTRIBUTING`, `docs/`, CI, or root `LICENSE`.
