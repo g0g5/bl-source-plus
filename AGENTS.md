@@ -1,60 +1,55 @@
-## Project Overview
-A Blender add-on for importing and exporting Valve Source Engine assets (SMD, DMX, QC). Currently a rename/repackage of "Blender Source Tools" v3.4.3 as the base for a more modern, feature-complete add-on. `uv` manages the dev environment only.
+## Overview
+
+Blender Source Plus is a Python add-on based on Blender Source Tools 3.4.3 that brings Valve Source Engine assets into Blender and exports them back to Source tools.
 
 ## Tech Stack
+
 - Language: Python 3.12 (`.python-version`, `pyproject.toml`)
-- Runtime / Framework: Blender add-on (`bpy`, `bmesh`, `mathutils`); primary target is **4.5 LTS** (the dev/dependency baseline), 4.1+ should work in theory but is not guaranteed
-- Key Dependencies: none at runtime; dev-only `fake-bpy-module-4-5` for `bpy` type stubs
-- Package Manager: `uv` (non-package project; dev env + dependency management only)
+- Runtime / Framework: Blender 4.5 LTS (`bpy`, `bmesh`, `mathutils`) is the development and functional testing baseline. `bl_info` declares Blender 4.1.0 as the minimum version.
+- Key Dependencies: Blender's bundled Python APIs at runtime and `fake-bpy-module-4-5` for development type stubs.
+- Package Manager: `uv` manages the development environment (`package = false`). The build script packages the add-on for Blender.
 
 ## Structural Map
 
 ```
 bl-source-plus/
-|- pyproject.toml              # uv project def (dev env only, package = false); no build backend
-|- uv.lock                     # Lockfile (dev dep fake-bpy-module-4-5 only)
+|- pyproject.toml              # uv development configuration and add-on ZIP version
+|- uv.lock                     # Locked development dependencies
 |- scripts/
-|  \- build_addon.py           # Packages src/bl_source_plus into dist/bl_source_plus-<version>.zip
-|- dist/                       # Build products (gitignored); installable add-on zips
+|  \- build_addon.py           # Builds the installable add-on ZIP
 \- src/
-   \- bl_source_plus/          # The Blender add-on package (zip root folder when installed)
-      |- __init__.py           # Add-on entrypoint: bl_info, PropertyGroups, register()/unregister(), menu hooks
-      |- utils.py              # Shared base: State singleton, engine/compiler detection, formatting/logging helpers
-      |- datamodel.py          # Standalone DMX read/write (binary + KeyValues2); no bpy dependency
+   \- bl_source_plus/          # Blender add-on package and ZIP root folder
+      |- __init__.py           # Add-on metadata, property groups, registration, and menu hooks
+      |- utils.py              # Shared state, engine/compiler detection, formatting, and logging
+      |- datamodel.py          # Standalone binary and KeyValues2 DMX codec
       |- export_smd.py         # SMD/DMX exporter and QC compile operator
-      |- import_smd.py         # SMD/QC importer operator
-      |- flex.py               # Flex controller + shape-key/corrective-driver logic
-      |- GUI.py                # Blender panels, menus, UIList, config operators
-      |- translations.py       # Localized display strings (EN/JP)
-      |- update.py             # In-addon self-updater (still points at the original BST server)
-      \- ordered_set.py        # Vendored MIT OrderedSet utility
+      |- import_smd.py         # SMD, VTA, DMX, and QC importer
+      |- flex.py               # Flex controllers, shape keys, and corrective drivers
+      \- GUI.py                # 3D View sidebar panels in the Source Plus tab and other UI classes
 ```
 
-Module dependency direction: `datamodel` is a standalone leaf; `utils` depends on `datamodel`; the core operators depend on `utils`/`datamodel`; `GUI` and the add-on `__init__` sit on top and own Blender registration.
+`datamodel` is independent of Blender. `utils` and the core operators use it, `GUI` uses the operators, and `__init__` owns Blender registration.
 
-## Development Guide
-### Commands
+## Commands
 
-```
-# Install/sync dependencies (creates .venv; does not install the add-on)
+```powershell
+# Sync development dependencies into .venv.
 uv sync
 
-# Build the installable add-on zip -> dist/bl_source_plus-<version>.zip
+# Build the installable ZIP in dist/. The build script handles packaging.
 uv run python scripts/build_addon.py
 
-# Run Python in the project env
-uv run python <script>
+# Run a Python script in the development environment.
+uv run python path/to/script.py
+
+# Use the Blender CLI workflow below for functional tests. The repository has no configured test, lint, typecheck, or format commands.
 ```
 
-There is no test, lint, typecheck, or format command configured in this repo. Do not assume one exists. `uv build` is intentionally unavailable (no build backend).
+## Workflows
 
-### Workflows
-- Use the standalone `blender-cli` program for add-on functional testing. See [blender-functional-testing.md](.agents/workflows/blender-functional-testing.md) for the project workflow.
-- **Building the add-on**: run `scripts/build_addon.py`. It reads the version from `[project].version` in `pyproject.toml` (via `tomllib`) for the zip filename, stages the source excluding `__pycache__`/compiled files, and writes a zip whose single top-level folder is `bl_source_plus/` (required by Blender's install-from-zip).
-- **Installing**: in Blender 4.1+, *Edit > Preferences > Add-ons > Install...* and pick the zip from `dist/`.
+- [blender-functional-testing.md](.agents/workflows/blender-functional-testing.md) - Add-on functional testing with Blender CLI.
+- [build-and-install.md](.agents/workflows/build-and-install.md) - Build and install the add-on ZIP.
 
 ## Notes
-- The add-on package was renamed from the vendored `io_scene_valvesource/` to `src/bl_source_plus/`. All imports are relative, so only the install module id changed; the underlying Blender Source Tools logic is untouched for now.
-- `update.py` still self-updates from the original Blender Source Tools server and extracts into the package's parent directory; it is effectively non-functional for this project until repointed.
-- `README.md` is empty and there is no `CONTRIBUTING`, `docs/`, CI, or root `LICENSE`.
-- Licensing is mixed: most add-on files are GPL-2.0-or-later; `datamodel.py` and `ordered_set.py` are MIT.
+
+- [repository-maintenance.md](.agents/notes/repository-maintenance.md) - Upstream package history, updater status, and license notices.
